@@ -15,20 +15,20 @@ export default class Order extends React.Component {
     onClickChangeStatus: () => {}
   };
 
-  handleClickChangeStatus = (id, status) => {
-    const {onClickChangeStatus} = this.props;
-    onClickChangeStatus({id,status});
+  handleClickChangeStatus = (order_id, item_id, status_id) => {
+    const { onClickChangeStatus } = this.props;
+    onClickChangeStatus({ order_id, item_id, status_id });
   };
 
-  getStatusIdToName = (id) => {
-    const {statuses} = this.props;
+  getStatusIdToName = id => {
+    const { statuses } = this.props;
 
-    const name =  _.find(statuses, ['value', id]) || {};
-    return name.label
+    const name = _.find(statuses, ['value', id]) || {};
+    return name.label;
   };
 
   render() {
-    const { orders,onClickChangeStatus } = this.props;
+    const { orders, onClickChangeStatus } = this.props;
     return (
       <Wrapper>
         {orders.map((order, i) => {
@@ -56,12 +56,18 @@ export default class Order extends React.Component {
                         <ChangeStatus>
                           <span
                             onClick={() =>
-                              this.handleClickChangeStatus(item.id, item.status_id)
+                              this.handleClickChangeStatus(
+                                order.id,
+                                item.id,
+                                item.status_id
+                              )
                             }>
                             Change Status
                           </span>
                         </ChangeStatus>
-                        <Status> {this.getStatusIdToName(item.status_id)} </Status>
+                        <Status>
+                          {this.getStatusIdToName(item.status_id)}
+                        </Status>
                       </DivRight>
                     </Item>
                   );

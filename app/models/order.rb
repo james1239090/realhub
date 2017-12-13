@@ -5,7 +5,7 @@ class Order
 
   def initialize(**query)
     @options = { query:  query,
-                 headers: {"x-api-token": ""}}
+                 headers: {"x-api-token": ENV['api_token']}}
   end
   def all
     self.class.get("/orders.json", @options)

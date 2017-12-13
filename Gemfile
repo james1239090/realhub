@@ -37,6 +37,7 @@ gem 'jbuilder', '~> 2.5'
 #
 gem 'httparty'
 gem "react-rails"
+gem "figaro"
 
 
 group :development, :test do

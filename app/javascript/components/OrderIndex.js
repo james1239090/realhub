@@ -12,52 +12,51 @@ export default class OrderIndex extends React.Component {
   static defaultProps = {
     orders: []
   };
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       modalIsOpen: false,
       statuses: [],
       itemStatus: {
-        id: '',
-        status: ''
-      }
+        order_id: '',
+        item_id: '',
+        status_id: ''
+      },
+      orders: props.orders
     };
 
     this.openModal = this.openModal.bind(this);
-    this.afterOpenModal = this.afterOpenModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
   }
   openModal() {
     this.setState({ modalIsOpen: true });
   }
 
-  afterOpenModal() {
-    this.subtitle.style.color = '#f00';
-  }
-
   closeModal() {
     this.setState({
       modalIsOpen: false,
       itemStatus: {
-        id: '',
-        status: ''
+        order_id: '',
+        item_id: '',
+        status_id: ''
       }
     });
   }
 
-  handleClickChangeStatus = ({ id, status }) => {
+  handleClickChangeStatus = ({ order_id, item_id, status_id }) => {
     this.openModal();
     this.setState({
       itemStatus: {
-        id: id,
-        status: status
+        order_id: order_id,
+        item_id: item_id,
+        status_id: status_id
       }
     });
   };
   handleStatusChange = option => {
     let itemStatus = Object.assign({}, this.state.itemStatus);
-    itemStatus.status = _.get(option, 'value', null);
+    itemStatus.status_id = _.get(option, 'value', null);
     this.setState({
       itemStatus: itemStatus
     });
@@ -83,9 +82,10 @@ export default class OrderIndex extends React.Component {
     const token = document
       .querySelector('meta[name="csrf-token"]')
       .getAttribute('content');
-    const status = this.getStatusIdToName(item.status);
- 
-    fetch(`/order_items/${item.id}`, {
+    const status = this.getStatusIdToName(item.status_id);
+    const { item_id, order_id, status_id } = item;
+
+    fetch(`/order_items/${item_id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -93,12 +93,30 @@ export default class OrderIndex extends React.Component {
       },
       body: JSON.stringify({
         status: status
-      })
-    }).then(response => response.json());
+      }),
+      credentials: 'same-origin'
+    }).then(response => {
+      if (response.status === 200) {
+        const clonedOrders = _.clone(this.state.orders);
+        const updatedOrderIndex = _.findIndex(clonedOrders, { id: order_id });
+        const updatedItemIndex = _.findIndex(
+          clonedOrders[updatedOrderIndex].items,
+          { id: item_id }
+        );
+        _.set(
+          clonedOrders,
+          `${updatedOrderIndex}.items.${updatedItemIndex}.status_id`,
+          status_id
+        );
+        this.setState({
+          orders: clonedOrders
+        });
+        this.closeModal();
+      }
+    });
   };
   getStatusIdToName = id => {
     const { statuses } = this.state;
-
     const name = _.find(statuses, ['value', id]) || {};
     return name.label;
   };
@@ -127,7 +145,7 @@ export default class OrderIndex extends React.Component {
             <Row>
               <Select
                 name="form-field-name"
-                value={itemStatus.status}
+                value={itemStatus.status_id}
                 multi={false}
                 onChange={this.handleStatusChange}
                 options={statuses}
