@@ -1,21 +1,34 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import _ from 'lodash';
 
 export default class Order extends React.Component {
   static propTypes = {
-    orders: PropTypes.array
+    orders: PropTypes.array,
+    statuses: PropTypes.array,
+    onClickChangeStatus: PropTypes.func
   };
   static defaultProps = {
-    orders: []
+    orders: [],
+    statuses: [],
+    onClickChangeStatus: () => {}
   };
 
-  handleCellClick = (item_id, status) => {
+  handleClickChangeStatus = (id, status) => {
+    const {onClickChangeStatus} = this.props;
+    onClickChangeStatus({id,status});
+  };
 
-  }
+  getStatusIdToName = (id) => {
+    const {statuses} = this.props;
+
+    const name =  _.find(statuses, ['value', id]) || {};
+    return name.label
+  };
+
   render() {
-    const { orders } = this.props;
-
+    const { orders,onClickChangeStatus } = this.props;
     return (
       <Wrapper>
         {orders.map((order, i) => {
@@ -41,10 +54,14 @@ export default class Order extends React.Component {
                           <a href={downloadLink}> Download ArtWork</a>
                         </Url>
                         <ChangeStatus>
-                          <a href="#" 
-                          onClick= {this.handleChangeStatusClick}>Change Status</a>
+                          <span
+                            onClick={() =>
+                              this.handleClickChangeStatus(item.id, item.status_id)
+                            }>
+                            Change Status
+                          </span>
                         </ChangeStatus>
-                        <Status> {item.status_id} </Status>
+                        <Status> {this.getStatusIdToName(item.status_id)} </Status>
                       </DivRight>
                     </Item>
                   );
@@ -100,7 +117,9 @@ const DivRight = styled.div`
 
 const Status = styled.span`
   float: left;
-  width: 1rem;
+  width: 6rem;
+  text-align: right;
+  font-size: 11pt;
 `;
 
 const ChangeStatus = styled.span`
@@ -110,4 +129,4 @@ const ChangeStatus = styled.span`
 const Url = styled.span`
   float: left;
   width: 10rem;
-`
+`;
