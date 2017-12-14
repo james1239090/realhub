@@ -35,10 +35,10 @@ export default class Order extends React.Component {
           return (
             <Card>
               <Header>
-                <span>{order.agency.title}</span> -
-                <span>{order.campaign.street_number}</span>
-                <span>{order.campaign.street_name}</span>,
-                <span>{order.campaign.suburb_name}</span>
+                <Title>{order.agency.title}</Title>
+                <Address>{order.campaign.street_number}</Address>
+                <Address>{order.campaign.street_name}</Address>
+                <Address>{order.campaign.suburb_name}</Address>
               </Header>
               <Body>
                 {order.items.map((item, i) => {
@@ -52,9 +52,11 @@ export default class Order extends React.Component {
 
                       <DivRight>
                         <Url>
-                          <a href={downloadLink}>
-                            <FontAwesome name="file-pdf-o" />
-                          </a>
+                          {downloadLink && (
+                            <a href={downloadLink}>
+                              <FontAwesome name="file-pdf-o" />
+                            </a>
+                          )}
                         </Url>
                         <ChangeStatus>
                           <span
@@ -66,7 +68,6 @@ export default class Order extends React.Component {
                               )
                             }>
                             <FontAwesome name="pencil-square-o" />
-                            
                           </span>
                         </ChangeStatus>
                         <Status>
@@ -110,6 +111,16 @@ const Header = styled.div`
   border-bottom: 1px solid rgba(0, 0, 0, 0.125);
 `;
 
+const Title = styled.label`
+  font-weight: bold;
+`;
+
+const Address = styled.label`
+  margin-left: 5px;
+  color: #868e96;
+  font-size: 11px;
+`
+
 const Body = styled.div`
   flex: 1 1 auto;
   padding: 1.25rem;
@@ -123,20 +134,24 @@ const Item = styled.div`
 
 const DivRight = styled.div`
   float: right;
+  width: 190px;
 `;
 
-const Status = styled.span`
+const ActionDiv = styled.div`
   float: left;
-  width: 6rem;
   text-align: right;
-  font-size: 11pt;
 `;
 
-const ChangeStatus = styled.span`
-  float: left;
-  width: 3rem;
+const Status = ActionDiv.extend`
+  width: 90px;
 `;
-const Url = styled.span`
-  float: left;
-  width: 3rem;
+
+const ChangeStatus = ActionDiv.extend`
+  width: 50px;
+  text-align: right;
+`;
+
+const Url = ActionDiv.extend`
+  width: 50px;
+  min-height: 13px;
 `;
