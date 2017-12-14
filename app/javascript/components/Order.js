@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import _ from 'lodash';
-
+import FontAwesome from 'react-fontawesome';
 export default class Order extends React.Component {
   static propTypes = {
     orders: PropTypes.array,
@@ -49,9 +49,12 @@ export default class Order extends React.Component {
                     <Item>
                       <span>{item.title}</span>
                       <span>{item.options_string}</span>
+
                       <DivRight>
                         <Url>
-                          <a href={downloadLink}> Download ArtWork</a>
+                          <a href={downloadLink}>
+                            <FontAwesome name="file-pdf-o" />
+                          </a>
                         </Url>
                         <ChangeStatus>
                           <span
@@ -62,7 +65,8 @@ export default class Order extends React.Component {
                                 item.status_id
                               )
                             }>
-                            Change Status
+                            <FontAwesome name="pencil-square-o" />
+                            
                           </span>
                         </ChangeStatus>
                         <Status>
@@ -130,9 +134,9 @@ const Status = styled.span`
 
 const ChangeStatus = styled.span`
   float: left;
-  width: 8rem;
+  width: 3rem;
 `;
 const Url = styled.span`
   float: left;
-  width: 10rem;
+  width: 3rem;
 `;
