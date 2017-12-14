@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import Order from './Order';
 import Modal from 'react-modal';
 import SelectDefault from 'react-select';
+import APIs from '../packs/APIs';
+import _ from 'lodash';
 
 export default class OrderIndex extends React.Component {
   static propTypes = {
@@ -26,16 +28,17 @@ export default class OrderIndex extends React.Component {
       orders: props.orders
     };
 
-    this.openModal = this.openModal.bind(this);
-    this.closeModal = this.closeModal.bind(this);
+    this.handleopenModal = this.handleopenModal.bind(this);
+    this.handlecloseModal = this.handlecloseModal.bind(this);
   }
-  openModal() {
+  handleopenModal() {
     this.setState({ modalIsOpen: true });
   }
 
-  closeModal() {
+  handlecloseModal() {
     this.setState({
       modalIsOpen: false,
+      csrfToken: '',
       itemStatus: {
         order_id: '',
         item_id: '',
@@ -45,7 +48,7 @@ export default class OrderIndex extends React.Component {
   }
 
   handleClickChangeStatus = ({ order_id, item_id, status_id }) => {
-    this.openModal();
+    this.handleopenModal();
     this.setState({
       itemStatus: {
         order_id: order_id,
@@ -62,40 +65,27 @@ export default class OrderIndex extends React.Component {
     });
   };
 
-  getStatuses = () => {
-    fetch(`/statuses.json`).then(response =>
-      response.json().then(data => {
-        const statues = data.map((value, i) => {
-          return {
-            value: value.id,
-            label: value.title
-          };
-        });
-        this.setState({
-          statuses: statues
-        });
-      })
-    );
-  };
+  handleStatusOptions() {
+    APIs.getStatuses().then(data => {
+      const statuses = data.map((value, i) => {
+        return {
+          value: value.id,
+          label: value.title
+        };
+      });
+      this.setState({
+        statuses: statuses
+      });
+    });
+  }
 
   handleUpdateStatus = item => {
+    const status = this.getStatusIdToName(item.status_id);
+    const { item_id, order_id, status_id } = item;
     const token = document
       .querySelector('meta[name="csrf-token"]')
       .getAttribute('content');
-    const status = this.getStatusIdToName(item.status_id);
-    const { item_id, order_id, status_id } = item;
-
-    fetch(`/order_items/${item_id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': token
-      },
-      body: JSON.stringify({
-        status: status
-      }),
-      credentials: 'same-origin'
-    }).then(response => {
+    APIs.updateOrderItemStatus(item_id, status, token).then(response => {
       if (response.status === 200) {
         const clonedOrders = _.clone(this.state.orders);
         const updatedOrderIndex = _.findIndex(clonedOrders, { id: order_id });
@@ -111,7 +101,7 @@ export default class OrderIndex extends React.Component {
         this.setState({
           orders: clonedOrders
         });
-        this.closeModal();
+        this.handlecloseModal();
       }
     });
   };
@@ -121,11 +111,11 @@ export default class OrderIndex extends React.Component {
     return name.label;
   };
   componentWillMount = () => {
-    this.getStatuses();
+    this.handleStatusOptions();
   };
   render() {
     const { orders } = this.props;
-    const { statuses, itemStatus } = this.state;
+    const { statuses, itemStatus, modalIsOpen } = this.state;
     return (
       <div>
         <Order
@@ -134,8 +124,8 @@ export default class OrderIndex extends React.Component {
           statuses={statuses}
         />
         <Modal
-          isOpen={this.state.modalIsOpen}
-          onRequestClose={this.closeModal}
+          isOpen={modalIsOpen}
+          onRequestClose={this.handlecloseModal}
           style={customModalStyles}
           contentLabel="Change Status Modal">
           <Form>
@@ -144,15 +134,14 @@ export default class OrderIndex extends React.Component {
             </Row>
             <Row>
               <Select
-                name="form-field-name"
                 value={itemStatus.status_id}
-                multi={false}
                 onChange={this.handleStatusChange}
                 options={statuses}
+                clearable={false}
               />
             </Row>
             <Row align="center">
-              <CancelButton onClick={this.closeModal}>Close</CancelButton>
+              <CancelButton onClick={this.handlecloseModal}>Close</CancelButton>
               <EditButton
                 onClick={this.handleUpdateStatus.bind(this, itemStatus)}>
                 Update
