@@ -12,4 +12,3 @@ class OrderItem
     self.class.put("/order_items/#{id}.json", @options)
   end
 end
-
