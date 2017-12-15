@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import _ from 'lodash';
 import FontAwesome from 'react-fontawesome';
+import 'react-select/dist/react-select.css';
+import 'font-awesome/css/font-awesome.css';
 export default class Order extends React.Component {
   static propTypes = {
     orders: PropTypes.array,
