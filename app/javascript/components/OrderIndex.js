@@ -118,6 +118,7 @@ export default class OrderIndex extends React.Component {
     const { statuses, itemStatus, modalIsOpen } = this.state;
     return (
       <div>
+        <Nav>Orders</Nav>
         <Order
           orders={orders}
           onClickChangeStatus={this.handleClickChangeStatus}
@@ -201,4 +202,11 @@ const CancelButton = styled(Button)`
 const EditButton = styled(Button)`
   background-color: #28a745;
   border-color: #28a745;
+`;
+
+const Nav = styled.nav`
+  font-size: 24px;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  background-color: #f7f7f9;
 `;

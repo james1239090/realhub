@@ -88,7 +88,7 @@ export default class Order extends React.Component {
 }
 
 const Wrapper = styled.div`
-  padding: 4em;
+  padding: 2em 4em;
 `;
 
 const Card = styled.div`
